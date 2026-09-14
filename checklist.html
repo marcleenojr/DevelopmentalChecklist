@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Developmental Checklist</title>
+<style>
+  :root{
+    --bg:#f4f5f7;
+    --card:#ffffff;
+    --ink:#1f2430;
+    --muted:#6b7280;
+    --accent:#3b6ef6;
+    --accent-dark:#2851c9;
+    --border:#e3e5ea;
+    --pre:#f59e0b;
+    --mid:#3b6ef6;
+    --post:#16a34a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-bottom:80px;
+  }
+  header{
+    background:var(--accent);
+    color:#fff;
+    padding:18px 16px 14px;
+    position:sticky;
+    top:0;
+    z-index:10;
+    box-shadow:0 2px 6px rgba(0,0,0,.12);
+  }
+  header h1{
+    margin:0 0 4px;
+    font-size:1.15rem;
+  }
+  header p{
+    margin:0;
+    font-size:.8rem;
+    opacity:.9;
+  }
+  .legend{
+    display:flex;
+    gap:14px;
+    margin-top:10px;
+    font-size:.75rem;
+    flex-wrap:wrap;
+  }
+  .legend span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  .dot{
+    width:10px;height:10px;border-radius:50%;display:inline-block;
+  }
+  .dot.pre{background:var(--pre);}
+  .dot.mid{background:var(--mid);}
+  .dot.post{background:var(--post);}
+
+  main{
+    max-width:760px;
+    margin:0 auto;
+    padding:12px;
+  }
+
+  .domain{
+    background:var(--card);
+    border-radius:12px;
+    margin-bottom:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06);
+    overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .domain-header{
+    background:#eef1fb;
+    padding:12px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
+    user-select:none;
+  }
+  .domain-header h2{
+    margin:0;
+    font-size:.95rem;
+    letter-spacing:.02em;
+  }
+  .domain-header .count{
+    font-size:.75rem;
+    color:var(--muted);
+  }
+  .domain-body{
+    padding:4px 0;
+  }
+  .domain-body.collapsed{
+    display:none;
+  }
+  .item-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:10px 14px;
+    border-top:1px solid var(--border);
+  }
+  .item-num{
+    flex:0 0 22px;
+    font-size:.78rem;
+    color:var(--muted);
+    font-weight:600;
+    padding-top:2px;
+  }
+  .item-text{
+    flex:1;
+    font-size:.85rem;
+    line-height:1.35;
+    padding-top:1px;
+  }
+  .item-checks{
+    display:flex;
+    gap:8px;
+    flex:0 0 auto;
+    padding-top:1px;
+  }
+  .chk-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+  }
+  .chk-wrap label{
+    font-size:.6rem;
+    color:var(--muted);
+  }
+  input[type=checkbox]{
+    width:18px;
+    height:18px;
+    cursor:pointer;
+  }
+  input[type=checkbox].pre{accent-color:var(--pre);}
+  input[type=checkbox].mid{accent-color:var(--mid);}
+  input[type=checkbox].post{accent-color:var(--post);}
+
+  .toolbar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    background:#fff;
+    border-top:1px solid var(--border);
+    padding:10px 12px;
+    display:flex;
+    gap:8px;
+    box-shadow:0 -2px 8px rgba(0,0,0,.08);
+    z-index:20;
+  }
+  .toolbar button{
+    flex:1;
+    padding:11px 8px;
+    border-radius:9px;
+    border:none;
+    font-size:.85rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  #generateBtn{background:var(--accent);color:#fff;}
+  #generateBtn:active{background:var(--accent-dark);}
+  #clearBtn{background:#fef2f2;color:#b91c1c;}
+  #copyBtn{background:#f0fdf4;color:#166534;display:none;}
+
+  #output{
+    max-width:760px;
+    margin:0 auto 100px;
+    padding:0 12px;
+  }
+  #outputBox{
+    background:#111827;
+    color:#e5e7eb;
+    padding:14px;
+    border-radius:10px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.8rem;
+    white-space:pre-wrap;
+    word-break:break-word;
+    display:none;
+    line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Developmental Checklist</h1>
+  <p>Receptive &amp; Expressive Language · Cognitive · Self-help · Social-Emotional</p>
+  <div class="legend">
+    <span><span class="dot pre"></span>Pre-Test</span>
+    <span><span class="dot mid"></span>Mid-Test</span>
+    <span><span class="dot post"></span>Post-Test</span>
+  </div>
+</header>
+
+<main id="domainContainer"></main>
+
+<div id="output">
+  <div id="outputBox"></div>
+</div>
+
+<div class="toolbar">
+  <button id="clearBtn" type="button">I-clear</button>
+  <button id="generateBtn" type="button">Buuin ang Listahan</button>
+  <button id="copyBtn" type="button">Kopyahin</button>
+</div>
+
+<script>
+const domains = [
+  {
+    key: "receptive",
+    title: "RECEPTIVE LANGUAGE DOMAIN",
+    items: [
+      "Naituturo ang miyembro ng pamilya kapag ipinagawa",
+      "Naituturo ang limang bahagi ng katawan kapag ipinagawa.",
+      "Naituturo ang limang napangalanang larawan ng mga bagay kapag ipinagawa",
+      "Nakasusunod sa isang hakbang na panuto na mayroong simpleng pang-ukol (halimbawa: sa, sa mga, para sa/kay)",
+      "Nakasusunod sa dalawang hakbang na panuto na mayroong simpleng pang-ukol (halimbawa: kunin ang bola sa ilalim ng upuan at ibigay kay nanay)"
+    ]
+  },
+  {
+    key: "expressive",
+    title: "EXPRESSIVE LANGUAGE DOMAIN",
+    items: [
+      "Nakagagamit ng 5-20 na nakikilalang salita (halimbawa: mama, papa, etc)",
+      "Nakagagamit ng panghalip (hal. ako, ikaw, siya)",
+      "Nakagagamit ng 2-3 kombinasyon ng pandiwa-pangngalan (hal. Hingi ng gatas)",
+      "Napapangalanan ang mga bagay sa isang larawan (hal. larawan ng bola, nasasabi ng bata na ito ay bola)",
+      "Nakapagsasalita nang tama - 2-3 salita sa tamang pangungusap",
+      "Nakapagtatanong ng mga \"ano\" na tanong",
+      "Nakapagtatanong ng \"sino\" at \"bakit\" na tanong",
+      "Naikukuwento ang karanasan (kapag tinatanong/dinidiktahan) nang naayon sa pagkasunod sunod na pangyayari gamit ang mga salitang tumutukoy sa pangnakaraan (past-tense)"
+    ]
+  },
+  {
+    key: "cognitive",
+    title: "COGNITIVE DOMAIN",
+    items: [
+      "Nakikita ang direksyon ng nahuhulog na bagay",
+      "Nahahanap ang mga bagay na bahagyang nakatago",
+      "Nagagaya ang mga kilos na kakikita pa lamang",
+      "Naibibigay ang bagay ngunit hindi ito binibitawan",
+      "Nahahanap ang mga bagay na lubusang nakatago",
+      "Nakapaglalaro ng kunwari-warian (gaya ng pagpapakain at pagpapatulog sa manika)",
+      "Napagtutugma ang mga bagay",
+      "Napagtutugma ang 2-3 mga kulay",
+      "Napagtutugma ang mga larawan",
+      "Naihihiwalay ang mga bagay batay sa hugis",
+      "Naihihiwalay ang mga bagay batay dalawang katangian (hal. sa laki at sa hugis)",
+      "Naisasaayos ang mga bagay batay sa laki mula sa pinakamaliit hanggang sa pinakamalaki",
+      "Napapangalanan ang 4-6 na kulay",
+      "Nagagaya ang mga hugis",
+      "Napapangalanan ang mga hayop at gulay kapag tinanong",
+      "Nasasabi ang gamit ng karaniwang kasangkapan sa bahay",
+      "Nabubuo ang simple puzzle",
+      "Naiintindahan ang mga magkakasalungat na salita sa pamamagitan ng pagkumpleto ng pangungusap (hal. Ang aso ay malaki, ang daga ay ____)",
+      "Naituturo ang kaliwa at kanang bahagi ng katawan",
+      "Nasasabi kung ano ang mali sa larawan (hal. larawan ng pusang may pakpak. Itatanong sa bata kung ano ang mali sa larawan.)",
+      "Napagtutugma ang malalaki at maliliit na mga letra"
+    ]
+  },
+  {
+    key: "selfhelp",
+    title: "SELF-HELP DOMAIN",
+    items: [
+      "Nakakakain ng mga pagkaing nakakamay (gaya ng biskwit at tinapay)",
+      "Nakakakain gamit ang mga daliri para makakain ng kanin at ulam nang may natatapon",
+      "Nakakakain gamit ang kutsara nang may natatapon na pagkain",
+      "Nakakakain gamit ang mga daliri nang walang natatapon na pagkain",
+      "Nakakakain gamit ang kutsara nang walang natatapon na pagkain",
+      "Nakakakain nang hindi na sinusubuan sa tuwing kakain",
+      "Nakahahawak ng baso/tasa para sa pag-inom nang may tulong",
+      "Nakaiinom sa baso nang may natatapon",
+      "Nakakukuha ng inumin nang mag-isa",
+      "Naisasalin sa baso ang inumin mula sa pitsel nang walang tapon",
+      "Nakalulundag nang isa hanggang tatlong beses gamit ang mas gustong paa",
+      "Nakapaghahanda ng sariling pagkain/meryenda",
+      "Nakapaghahanda ng pagkain para sa nakababatang kapatid/ibang miyembro ng pamilya.",
+      "Nakikipagtulungan kung binibihisan (hal. Itinataas ang mga kamay at paa)",
+      "Nakapaghuhubad ng sariling shorts na may garter",
+      "Nakapaghuhubad ng sariling sando",
+      "Nakapagbibihis nang sarili na walang tulong, maliban sa pagbubutones at pagtatali",
+      "Nakapagbibihis nang sarili na walang tulong kasama ang pagbubutones at pagtatali",
+      "Nagsasabi sa nakatatanda pagkatapos lamang makaihi o makadumi sa kaniyang shorts.",
+      "Nagsasabi sa nakatatanda kapag kailangan umihi o dumumi upang makapunta sa tamang lugar (C.R).",
+      "Nakapupunta sa tamang lugar upang umihi o dumumi ngunit minsan ay naiihi at nadudumi pa rin sa shorts",
+      "Nakapupunta sa tamang lugar upang umihi o dumudumi at hindi na ito ginagawa sa kaniyang shorts o pambabang kasuotan.",
+      "Napupunasan/nililinisan ang sarili pagkatapos dumumi",
+      "Nakikipagtulungan kung pinapaliguan (hal. kinukuskos ang mga braso)",
+      "Nahuhugasan ang kamay nang walang tulong",
+      "Nakapaghihilamos nang walang tulong",
+      "Nakaliligo nang walang tulong"
+    ]
+  },
+  {
+    key: "social",
+    title: "SOCIAL-EMOTIONAL DOMAIN",
+    items: [
+      "Nasisiyahan sa panonood sa mga ginagawa ng mga tao o hayop sa kalapit na lugar",
+      "Nakikipagkaibigan sa mga hindi kakilala ngunit sa una ay natatakot o nahihiya",
+      "Naglalaro nang mag-isa ngunit gustong malapit sa kilalang nakatatanda o sa mga kuya o ate",
+      "Natatawa/nagsasalita nang malakas sa paglalaro",
+      "Naglalaro ng \"bulaga\"",
+      "Napagugulong ang bola sa kalaro o tagapag-alaga",
+      "Niyayakap ang mga laruan",
+      "Naipakikita ang paggalang sa mga nakatatanda sa pamamagitan ng pagamit ng \"po\" at \"opo\"",
+      "Nagpapahiram ng mga laruan sa kalaro",
+      "Nagagaya ang mga ginagawa ng mga nakakatanda (hal. pagluluto o paghuhugas)",
+      "Natutukoy ang nararamdaman ng iba",
+      "Naisasagawa nang tama ang mga nakasanayang pag-uugali nang hindi pinaalalahanan (gaya ng pagmamano, paghalik)",
+      "Napasasaya ang nalulungkot na mga kalaro",
+      "Nagsusumikap kung may mga problema at hadlang sa kaniyang mga nais/gusto",
+      "Naipakikita ang pagtulong sa mga gawaing bahay (hal. pagpunas ng mesa, pagdidilig)",
+      "Naipakikita ang pagiging mausisa sa kapaligiran subalit nalalaman kung kailan dapat huminto sa pagtatanong sa nakatatanda",
+      "Nakapaghihintay sa kaniyang panahon/oras",
+      "Nakahihingi ng pahintulot na mahiram ang laruan na nilalaro ng ibang bata",
+      "Naipaglalaban nang may determinasyon ang sariling gamit",
+      "Nakikipaglaro nang maayos sa grupo (hal. hindi nandadaya para manalo)",
+      "Nasasabi ang mga nararanasang hindi magandang nararamdaman (hal. galit, lungkot, pag-aalala)",
+      "Naipakikita ang paggalang sa napag-usapang kasunduan ng tagapag-alaga (hal. makapaglalaro sa labas pagkatapos lamang maglinis ng kaniyang kuwarto)",
+      "Nababantayan nang mabuti ang nakababatang kapatid/miyembro ng pamilya",
+      "Nakikipagtulungan sa nakakatanda at mga kasama sa mga sitwasyon para maiwasan ang mga pag-aaway at alitan"
+    ]
+  }
+];
+
+const container = document.getElementById("domainContainer");
+
+domains.forEach(domain => {
+  const domainDiv = document.createElement("div");
+  domainDiv.className = "domain";
+
+  const headerDiv = document.createElement("div");
+  headerDiv.className = "domain-header";
+  headerDiv.innerHTML = `<h2>${domain.title}</h2><span class="count">${domain.items.length} items ▾</span>`;
+
+  const bodyDiv = document.createElement("div");
+  bodyDiv.className = "domain-body";
+
+  domain.items.forEach((text, idx) => {
+    const num = idx + 1;
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.innerHTML = `
+      <div class="item-num">${num}.</div>
+      <div class="item-text">${text}</div>
+      <div class="item-checks">
+        <div class="chk-wrap">
+          <input type="checkbox" class="pre" data-domain="${domain.key}" data-num="${num}" data-period="pre">
+          <label>Pre</label>
+        </div>
+        <div class="chk-wrap">
+          <input type="checkbox" class="mid" data-domain="${domain.key}" data-num="${num}" data-period="mid">
+          <label>Mid</label>
+        </div>
+        <div class="chk-wrap">
+          <input type="checkbox" class="post" data-domain="${domain.key}" data-num="${num}" data-period="post">
+          <label>Post</label>
+        </div>
+      </div>
+    `;
+    bodyDiv.appendChild(row);
+  });
+
+  headerDiv.addEventListener("click", () => {
+    bodyDiv.classList.toggle("collapsed");
+    const countSpan = headerDiv.querySelector(".count");
+    const collapsed = bodyDiv.classList.contains("collapsed");
+    countSpan.textContent = `${domain.items.length} items ${collapsed ? "▸" : "▾"}`;
+  });
+
+  domainDiv.appendChild(headerDiv);
+  domainDiv.appendChild(bodyDiv);
+  container.appendChild(domainDiv);
+});
+
+function buildOutputForPeriod(period, label) {
+  let text = label + "\n";
+  domains.forEach(domain => {
+    const checked = [];
+    document.querySelectorAll(`input[data-domain="${domain.key}"][data-period="${period}"]`).forEach(cb => {
+      if (cb.checked) checked.push(cb.dataset.num);
+    });
+    if (checked.length > 0) {
+      text += "\n" + domain.title + "\n" + checked.join(",") + "\n";
+    }
+  });
+  return text;
+}
+
+document.getElementById("generateBtn").addEventListener("click", () => {
+  let output = "";
+  const periods = [["pre", "PRE-TEST"], ["mid", "MID-TEST"], ["post", "POST-TEST"]];
+  periods.forEach(([key, label]) => {
+    const section = buildOutputForPeriod(key, label);
+    const hasChecks = section.trim() !== label;
+    if (hasChecks) {
+      output += "=".repeat(30) + "\n" + section + "\n";
+    }
+  });
+
+  const outputBox = document.getElementById("outputBox");
+  if (output.trim() === "") {
+    outputBox.textContent = "Wala pang naka-check na item.";
+  } else {
+    outputBox.textContent = output.trim();
+  }
+  outputBox.style.display = "block";
+  document.getElementById("copyBtn").style.display = "block";
+  outputBox.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  if (!confirm("I-clear lahat ng naka-check?")) return;
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  const outputBox = document.getElementById("outputBox");
+  outputBox.style.display = "none";
+  document.getElementById("copyBtn").style.display = "none";
+});
+
+document.getElementById("copyBtn").addEventListener("click", () => {
+  const text = document.getElementById("outputBox").textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("copyBtn");
+    const original = btn.textContent;
+    btn.textContent = "Kopyado!";
+    setTimeout(() => { btn.textContent = original; }, 1200);
+  });
+});
+</script>
+
+</body>
+</html>
